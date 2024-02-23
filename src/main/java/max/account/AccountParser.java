@@ -6,7 +6,7 @@ public class AccountParser {
         return Account.builder()
             .name(in.name())
             .email(in.email())
-            .hash(in.password())
+            .password(in.password())
             .build();
     }
 

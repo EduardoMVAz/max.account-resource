@@ -39,14 +39,15 @@ public class AccountModel {
         this.id = o.id();
         this.name = o.name();
         this.email = o.email();
-        this.hash = o.password();
+        this.hash = o.hash();
     }
 
     public Account to() {
-        return new Account()
+        return Account.builder()
             .id(id)
             .name(name)
             .email(email)
-            .hash(hash);
+            .hash(hash)
+            .build();
     }
 }

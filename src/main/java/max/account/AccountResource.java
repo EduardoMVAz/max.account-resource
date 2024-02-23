@@ -2,13 +2,18 @@ package max.account;
 
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 public class AccountResource implements AccountController {
+
+    @Autowired
+    private AccountService accountService;
 
     @GetMapping("/accounts/info")
 	public ResponseEntity<Map<String, String>> info() {
@@ -47,8 +52,19 @@ public class AccountResource implements AccountController {
 
 	@Override
 	public ResponseEntity<AccountOut> create(AccountIn accountIn) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'create'");
+        // parser
+        Account account = AccountParser.to(accountIn);
+
+        // insert using service
+        account = accountService.create(account);
+
+        return ResponseEntity.created(
+            ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(account.id())
+                .toUri())
+            .body(AccountParser.to(account));
 	}
 
 	@Override
@@ -56,6 +72,15 @@ public class AccountResource implements AccountController {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'update'");
 	}
+
+    @Override
+    public ResponseEntity<AccountOut> login(LoginIn in) {
+        Account account = accountService.login(in.email(), in.password());
+        if (account == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return ResponseEntity.ok(AccountParser.to(account));
+    }
 
 	@Override
 	public ResponseEntity<AccountOut> delete(String id) {

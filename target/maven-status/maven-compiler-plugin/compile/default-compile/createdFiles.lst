@@ -3,7 +3,7 @@ max/account/AccountRepository.class
 max/account/AccountService.class
 max/account/AccountParser.class
 max/account/AccountResource.class
-max/account/AccountModel$AccountModelBuilder.class
 max/account/AccountModel.class
+max/account/AccountModel$AccountModelBuilder.class
 max/account/AccountApplication.class
 max/account/Account$AccountBuilder.class

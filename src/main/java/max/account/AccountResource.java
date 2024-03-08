@@ -87,5 +87,14 @@ public class AccountResource implements AccountController {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'delete'");
 	}
+
+    @Override
+    public ResponseEntity<AccountOut> list(String idUser, String roleUser) {
+        final AccountOut account = AccountOut.builder()
+            .id(idUser)
+            .name(roleUser)
+            .build();
+        return ResponseEntity.ok(account);
+    }
     
 }

@@ -46,8 +46,20 @@ public class AccountResource implements AccountController {
 
 	@Override
 	public ResponseEntity<AccountOut> read(String id) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'read'");
+
+        Account dbAccount = accountService.read(id);
+
+        if (dbAccount == null) {
+            throw new RuntimeException("User id not found");
+        }
+
+		return ResponseEntity.ok(
+            AccountOut.builder()
+                .id(dbAccount.id())
+                .name(dbAccount.name())
+                .email(dbAccount.email())
+                .build()
+        );
 	}
 
 	@Override

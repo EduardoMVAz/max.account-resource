@@ -49,10 +49,6 @@ public class AccountResource implements AccountController {
 
         Account dbAccount = accountService.read(id);
 
-        if (dbAccount == null) {
-            throw new RuntimeException("User id not found");
-        }
-
 		return ResponseEntity.ok(
             AccountOut.builder()
                 .id(dbAccount.id())
@@ -64,10 +60,9 @@ public class AccountResource implements AccountController {
 
 	@Override
 	public ResponseEntity<AccountOut> create(AccountIn accountIn) {
-        // parser
+        
         Account account = AccountParser.to(accountIn);
 
-        // insert using service
         account = accountService.create(account);
 
         return ResponseEntity.created(
@@ -88,9 +83,6 @@ public class AccountResource implements AccountController {
     @Override
     public ResponseEntity<AccountOut> login(LoginIn in) {
         Account account = accountService.login(in.email(), in.password());
-        if (account == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
         return ResponseEntity.ok(AccountParser.to(account));
     }
 
@@ -102,6 +94,7 @@ public class AccountResource implements AccountController {
 
     @Override
     public ResponseEntity<AccountOut> list(String idUser, String roleUser) {
+        // TODO Auto-generated method stub
         final AccountOut account = AccountOut.builder()
             .id(idUser)
             .name(roleUser)

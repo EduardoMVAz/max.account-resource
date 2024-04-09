@@ -9,5 +9,7 @@ import org.springframework.stereotype.Repository;
 public interface AccountRepository extends CrudRepository<AccountModel, String> {
 
     public Optional<AccountModel> findByEmailAndHash(String email, String hash);
+
+    public Optional<AccountModel> findByEmail(String email);
     
 }

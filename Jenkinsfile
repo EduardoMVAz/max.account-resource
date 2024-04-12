@@ -1,12 +1,6 @@
 pipeline {
     agent any
     stages {
-        stage('Jenkins Account') {
-            steps {
-                echo 'Account Service'
-            }
-        }
-
         stage('Build Interface') {
             steps {
                 build job: 'Account', wait: true
@@ -22,7 +16,17 @@ pipeline {
         stage('Build Image') {
             steps {
                 script {
-                    account = docker.build("joaolucasmbc/account", "-f Dockerfile .")
+                    account = docker.build("joaolucasmbc/account:${env.BUILD_ID}", "-f Dockerfile .")
+                }
+            }
+        }
+        stage('Push Image'){
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credential') {
+                        account.push("${env.BUILD_ID}")
+                        account.push("latest")
+                    }
                 }
             }
         }

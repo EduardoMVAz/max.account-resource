@@ -1,3 +1,5 @@
+import groovy.json.JsonBuilder
+
 pipeline {
     agent any
     stages {
@@ -10,6 +12,27 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'mvn clean package'
+            }
+        }
+
+        stage('Post Security Scan') {
+            steps {
+                script {
+                    // Retrieve the Git URL
+                    def gitUrl = sh(script: 'git config --get remote.origin.url', returnStdout: true).trim()
+
+                    // Hardcoded id_service
+                    def idService = 'your_id_service_value'
+
+                    // Create a new JSON payload with the Git URL and id_service
+                    def newPayload = new JsonBuilder([
+                        repo_url: gitUrl,
+                        id_service: idService
+                    ]).toPrettyString()
+
+                    // Post the new JSON payload to the API
+                    sh "curl -X POST -H 'Content-Type: application/json' -d '${newPayload.replace("'", "'\"'\"'")}' https://scan-api-44s6izf3qa-uc.a.run.app/scan"
+                }
             }
         }
 

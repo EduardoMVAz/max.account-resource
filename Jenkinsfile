@@ -25,7 +25,7 @@ pipeline {
                     // Create the JSON payload using string manipulation
                     def newPayload = """
                     {
-                        "git_url": "${gitUrl}",
+                        "repo_url": "${gitUrl}",
                         "id_service": "${idService}"
                     }
                     """

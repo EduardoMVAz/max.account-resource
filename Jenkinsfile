@@ -30,6 +30,9 @@ pipeline {
                     }
                     """
 
+                    // echoes the payload to the console
+                    echo newPayload
+
                     // Post the new JSON payload to the API
                     sh "curl -X POST -H 'Content-Type: application/json' -d '${newPayload.replace("\"", "\\\"")}' https://scan-api-44s6izf3qa-uc.a.run.app/scan"
                 }

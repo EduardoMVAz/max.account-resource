@@ -1,5 +1,3 @@
-import groovy.json.JsonBuilder
-
 pipeline {
     agent any
     stages {
@@ -22,16 +20,18 @@ pipeline {
                     def gitUrl = sh(script: 'git config --get remote.origin.url', returnStdout: true).trim()
 
                     // Hardcoded id_service
-                    def idService = 'your_id_service_value'
+                    def idService = '31df0ac3-4d0a-405f-918b-3a1d04d81901'
 
-                    // Create a new JSON payload with the Git URL and id_service
-                    def newPayload = new JsonBuilder([
-                        repo_url: gitUrl,
-                        id_service: idService
-                    ]).toPrettyString()
+                    // Create the JSON payload using string manipulation
+                    def newPayload = """
+                    {
+                        "git_url": "${gitUrl}",
+                        "id_service": "${idService}"
+                    }
+                    """
 
                     // Post the new JSON payload to the API
-                    sh "curl -X POST -H 'Content-Type: application/json' -d '${newPayload.replace("'", "'\"'\"'")}' https://scan-api-44s6izf3qa-uc.a.run.app/scan"
+                    sh "curl -X POST -H 'Content-Type: application/json' -d '${newPayload.replace("\"", "\\\"")}' https://scan-api-44s6izf3qa-uc.a.run.app/scan"
                 }
             }
         }

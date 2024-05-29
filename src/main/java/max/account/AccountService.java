@@ -15,12 +15,15 @@ import max.account.exceptions.AccountNotFoundException;
 import max.account.exceptions.InternalHashingError;
 import max.account.exceptions.LoginFailedException;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 @Service
 public class AccountService {
     
     @Autowired
     private AccountRepository accountRepository;
 
+    @CircuitBreaker(name = "accountService", fallbackMethod = "fallbackAccountCreate")
     @CachePut(value = "accounts", key = "#result.id()")
     public Account create(Account in) {
         AccountModel account = accountRepository.findByEmail(in.email()).orElse(null);
@@ -34,6 +37,7 @@ public class AccountService {
         return accountRepository.save(new AccountModel(in)).to();
     }
 
+    @CircuitBreaker(name = "accountService", fallbackMethod = "fallbackAccountRead")
     @Cacheable(value = "accounts", key = "#id", unless = "#result == null")
     public Account read(String id) {
         Account account = accountRepository.findById(id).map(AccountModel::to).orElse(null);
@@ -45,6 +49,7 @@ public class AccountService {
         return account;
     }
 
+    @CircuitBreaker(name = "accountService", fallbackMethod = "fallbackAccountLogin")
     public Account login(String email, String password){
         String hash = calculateHash(password);
         Account account = accountRepository.findByEmailAndHash(email, hash).map(AccountModel::to).orElse(null);
@@ -54,6 +59,18 @@ public class AccountService {
         }
 
         return account;
+    }
+
+    public void fallbackAccountCreate(Account in, Throwable t) {
+        throw new RuntimeException("Failed to create account", t);
+    }
+
+    public void fallbackAccountRead(String id, Throwable t) {
+        throw new RuntimeException("Failed to read account", t);
+    }
+
+    public void fallbackAccountLogin(String email, String password, Throwable t) {
+        throw new RuntimeException("Failed to login", t);
     }
 
     public String calculateHash(String password) {
